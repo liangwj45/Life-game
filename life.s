@@ -1,17 +1,23 @@
 .data
-.align 4
-N: .word 15
-newBoard: .space 225
-main_ret: .space 4
-iterations: .space 4
-Nsquare: .space 4
-hash: .asciiz "#"
-dot: .asciiz "."
-iternum: .asciiz "# Iterations: "
-afterIter1: .asciiz "After iteration "
-afterIter2: .asciiz "\n"
-newline: .asciiz "\n"
-board:
+  N: 
+    .word 15
+  Nsquare: 
+    .word 224
+  newBoard: 
+    .space 225
+  iterations: 
+    .word 0
+  hash: 
+    .asciiz "#"
+  dot: 
+    .asciiz "."
+  inputMessage: 
+    .asciiz "# Iterations: "
+  afterIteration: 
+    .asciiz "\nAfter iteration "
+  endl:
+    .asciiz "\n"
+  board:
    .byte 1,0,0,0,0,0,0,0,0,0,1,0,0,0,0
    .byte 1,1,0,0,0,0,0,0,0,0,1,1,0,0,0
    .byte 0,0,0,1,0,0,0,0,0,0,1,0,1,0,0
@@ -32,18 +38,13 @@ board:
 .text
 .globl main
 main:
-  sw $ra,main_ret
-getIterations:
-  la $a0,iternum                       # Print message
+  la $a0,inputMessage                  # Print message
   li $v0,4
   syscall
   li $v0,5                             # Read user input
   syscall
-  sw $v0,iterations                    # Save iterations
-  lw $t0,N                             # Calculate N^2-1
-  mul $t0,$t0,$t0
-  addi $t0,$t0,-1
-  sw $t0,Nsquare                       # Save the result
+  la $v1,iterations
+  sw $v0,0($v1)                        # Save iterations
 initial:
   li $s0,1                             # Set iterations counter to 1
   iterations_loop:                     # Cycling loop begins
@@ -76,13 +77,13 @@ initial:
       addi $s1,1                       # End inner loop, increment and jump
       j logic_loop
   logic_end:
-    la $a0,afterIter1                  # Print "=== After iteration "
+    la $a0,afterIteration              # Print "After iteration "
     li $v0,4
     syscall     
     move $a0,$s0                       # Print the iteration number
     li $v0,1
     syscall
-    la $a0,afterIter2                  # Print " ===\n"
+    la $a0,endl
     li $v0,4
     syscall 
     jal copyBackAndShow                # Print the board and copy into new board
@@ -90,9 +91,9 @@ initial:
     addi $s0,1                         # Increment and save back
     j iterations_loop                  # Next iteration
   end_iterations_loop:
-end_main:
-  lw $ra,main_ret
-  jr $ra
+exit:
+  li $v0, 10
+  syscall                              # exit
 
 
 # Some funtions
@@ -157,7 +158,7 @@ copyBackAndShow:
         addu $t2,$t2,1                 # Increment and jump to the start of the loop
         j innerCopy
     endInnerCopy:
-      la $a0,newline                   # Print newline
+      la $a0,endl                      # Print endl
       li $v0,4
       syscall
       addu $t1,$t1,1                   # Increment row counter and continue

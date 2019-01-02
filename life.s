@@ -51,9 +51,9 @@ initial:
     lw  $t0,iterations                 # Load temporarily the number of iterations into $t0
     bgt $s0,$t0,end_iterations_loop    # Jump to the loop end if num_iters > specified_iters
     li  $s1,0                          # Initial counter $s1
-    logic_loop:                        # loop from 0 to N^2-1 
+    logic_loop:                        # loop from 0 to Nsquare
       lw   $t0,Nsquare                 # Get exit status
-      bgt  $s1,$t0 logic_end           # Exit if counter > N^2-1
+      bgt  $s1,$t0 logic_end           # Exit if counter > Nsquare
       move $a0,$s1                     # $a0 = current index
       jal  neighbours                  # Get neighbours
       move $s3,$v0                     # Copy the amount of neighbours to $s3
